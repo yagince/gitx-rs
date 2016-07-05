@@ -13,4 +13,5 @@ fn main() {
 
     let branches = git.branches();
     println!("branches: {:?}", branches.branches);
+    println!("current: {:?}", branches.current_branch());
 }

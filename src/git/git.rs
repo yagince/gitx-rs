@@ -25,19 +25,13 @@ impl Git {
 
     pub fn branches(&self) -> Branches {
         let output = self.command().arg("branch").output().unwrap();
-        let stdout = String::from_utf8_lossy(&output.stdout);
 
         let mut current = String::new();
 
-        println!("{}", stdout);
-        let map = stdout
+        let map = String::from_utf8_lossy(&output.stdout)
             .lines()
+            .map(|l| l.trim_matches(' '))
             .map(|l| {
-                println!("{}", l);
-                l.trim_matches(' ')
-            })
-            .map(|l| {
-                println!("{}", l);
                 let branch = Branch{name: l.replace("* ", "").to_string()};
                 if l.starts_with('*') {
                     current = branch.name.clone();
@@ -45,10 +39,9 @@ impl Git {
                 branch
             })
             .fold(HashMap::new(), |mut branches, branch| {
-                println!("{:?}", branches);
                 branches.insert(branch.name.clone(), branch);
                 branches
             });
-        Branches{branches: map, current_commit: current}
+        Branches{branches: map, current: current}
     }
 }
