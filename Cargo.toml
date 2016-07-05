@@ -1,0 +1,6 @@
+[package]
+name = "gitx_rs"
+version = "0.1.0"
+authors = ["yagince <straitwalk@gmail.com>"]
+
+[dependencies]
