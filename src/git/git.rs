@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::process::{Command, Output};
 use std::ffi::*;
 use git::branch::*;
+use git::log::*;
 
 pub struct Git {
     path: String,
@@ -43,5 +44,20 @@ impl Git {
                 branches
             });
         Branches{branches: map, current: current}
+    }
+
+    pub fn logs(&self) -> Vec<Log> {
+        let output = self.command()
+            .arg("log")
+            .arg("--oneline")
+            .output()
+            .unwrap();
+        String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .map(|l| {
+                let (commit, msg) = l.split_at(8);
+                Log::new(commit, msg)
+            })
+            .collect()
     }
 }
