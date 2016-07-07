@@ -17,6 +17,12 @@ pub struct Branch {
     pub name: String,
 }
 
+impl Branch {
+    pub fn new(name : &str) -> Branch {
+        Branch{name: name.to_string()}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     mod branches {

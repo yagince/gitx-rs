@@ -1,6 +1,8 @@
 extern crate gitx_rs;
 
+use std::process::Output;
 use gitx_rs::git::git::*;
+use gitx_rs::git::branch::*;
 
 fn main() {
     println!("== Status ==============================");
@@ -26,8 +28,20 @@ fn main() {
         println!("{}", l);
     }
 
-    println!("== Checkout ==============================");
+    println!("== Checkout Foo ==============================");
 
-    let output = git.checkout(&branches.current_branch());
-    println!("{}", String::from_utf8_lossy(&output.unwrap().stdout));
+    let default = Branch::new("-");
+    let branch = branches.branches.get(&"foo".to_string()).unwrap_or(&default);
+    let output = git.checkout(&branch);
+    print_stdout(&output.unwrap());
+
+    println!("== Checkout Prev ==============================");
+
+    let output = git.checkout_prev();
+    print_stdout(&output.unwrap());
+}
+
+fn print_stdout(output : &Output) {
+    println!("status: {}", output.status);
+    println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
 }
