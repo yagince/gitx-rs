@@ -12,7 +12,27 @@ impl Branches {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Branch {
     pub name: String,
+}
+
+#[cfg(test)]
+mod tests {
+    mod branches {
+        use std::collections::HashMap;
+        use super::super::*;
+
+        #[test]
+        fn current_branch() {
+            let mut map = HashMap::new();
+            map.insert("first".to_string(), Branch{name: "first".to_string()});
+            let branch = Branch{name: "second".to_string()};
+            map.insert("second".to_string(), branch.clone());
+
+            let branches = Branches{ branches: map, current: "second".to_string()};
+
+            assert_eq!(branch, branches.current_branch());
+        }
+    }
 }
