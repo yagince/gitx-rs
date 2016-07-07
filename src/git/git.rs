@@ -60,4 +60,8 @@ impl Git {
             })
             .collect()
     }
+
+    pub fn checkout(&self, branch : &Branch) -> io::Result<Output> {
+        self.command().arg("checkout").arg("-").output()
+    }
 }
