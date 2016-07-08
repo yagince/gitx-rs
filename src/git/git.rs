@@ -68,4 +68,8 @@ impl Git {
     pub fn checkout_prev(&self) -> io::Result<Output> {
         self.checkout(&Branch{name: "-".to_string()})
     }
+
+    pub fn create_branch(&self, branch : &Branch) -> io::Result<Output> {
+        self.command().arg("checkout").arg("-b").arg(&branch.name).output()
+    }
 }
