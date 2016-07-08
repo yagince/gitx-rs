@@ -13,6 +13,7 @@ const USAGE: &'static str = "
 
 Usage:
   git-x start <type> <number> <comment>
+  git-x (--help | --version)
 
 Options:
   -h --help     Show this screen.
