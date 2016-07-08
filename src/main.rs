@@ -29,7 +29,7 @@ struct Args {
 }
 
 fn main() {
-    debug();
+    // debug();
 
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.decode())
