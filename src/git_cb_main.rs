@@ -37,6 +37,16 @@ struct Context {
     input: String,
 }
 
+impl Context {
+    fn input(&mut self, c: char) {
+        self.input.push(c);
+    }
+
+    fn pop(&mut self) {
+        self.input.pop();
+    }
+}
+
 fn main() {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.decode())
@@ -85,22 +95,17 @@ fn exec() {
 
     print(&context);
 
-    let mut v = String::new();
-
     loop {
         match context.rustbox.poll_event(false) {
             Ok(rustbox::Event::KeyEvent(key)) => {
                 match key {
                     Key::Esc | Key::Ctrl('c') => { break; },
                     Key::Char(c) => {
-                        v.push(c);
-                        context.input = v.clone();
+                        context.input(c);
                         print(&context);
                     },
                     Key::Ctrl('h') | Key::Backspace | Key::Delete => {
-                        // TODO: clear
-                        v.pop();
-                        context.input = v.clone();
+                        context.pop();
                         print(&context);
                     },
                     _ => { },
