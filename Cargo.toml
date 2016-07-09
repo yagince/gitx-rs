@@ -7,8 +7,14 @@ authors = ["yagince <straitwalk@gmail.com>"]
 docopt = "0.6"
 rustc-serialize = "0.3"
 ansi_term = "0.7"
+rustbox = "*"
 
 [[bin]]
 name = "git-start"
 doc = false
 path = "src/git_start_main.rs"
+
+[[bin]]
+name = "git-cb"
+doc = false
+path = "src/git_cb_main.rs"
