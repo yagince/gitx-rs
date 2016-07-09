@@ -31,6 +31,12 @@ struct Args {
     flag_version: bool,
 }
 
+struct Context {
+    rustbox: RustBox,
+    branches: Branches,
+    input: String,
+}
+
 fn main() {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.decode())
@@ -43,42 +49,59 @@ fn main() {
     exec();
 }
 
+fn print(context: &Context) {
+    context.rustbox.clear();
+
+    context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Default, format!("QUERY > {}", context.input).as_ref());
+    context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c to exit.");
+
+    let mut list = context.branches.list();
+    list.sort();
+
+    let horizontal_offset = 2;
+
+    for (i, branch) in list.iter().enumerate() {
+        if context.branches.is_current(branch) {
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, format!("{:2}: * {}", i, branch.name).as_ref());
+        } else {
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, format!("{:2}:  {}", i, branch.name).as_ref());
+        }
+    }
+
+    context.rustbox.present();
+}
+
 fn exec() {
     let rustbox = RustBox::init(Default::default()).unwrap_or_else(|e| panic!(e));
 
     let git = Git::new();
     let branches = git.branches();
 
-    let mut list = branches.list();
-    list.sort();
+    let mut context = Context{
+        rustbox: rustbox,
+        branches: branches,
+        input: String::new(),
+    };
 
-    for (i, branch) in list.iter().enumerate() {
-        if branches.is_current(branch) {
-            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::Green, Color::Default, format!("* {}", branch.name).as_ref());
-        } else {
-            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::White, Color::Default, format!("  {}", branch.name).as_ref());
-        }
-    }
-
-    rustbox.present();
+    print(&context);
 
     let mut v = String::new();
 
     loop {
-        match rustbox.poll_event(false) {
+        match context.rustbox.poll_event(false) {
             Ok(rustbox::Event::KeyEvent(key)) => {
                 match key {
-                    Key::Char('q') | Key::Ctrl('c') => { break; },
+                    Key::Esc | Key::Ctrl('c') => { break; },
                     Key::Char(c) => {
                         v.push(c);
-                        rustbox.print(1, 0, rustbox::RB_BOLD, Color::White, Color::Default, v.as_ref());
-                        rustbox.present();
+                        context.input = v.clone();
+                        print(&context);
                     },
-                    Key::Backspace | Key::Delete => {
+                    Key::Ctrl('h') | Key::Backspace | Key::Delete => {
                         // TODO: clear
                         v.pop();
-                        rustbox.print(1, 0, rustbox::RB_BOLD, Color::White, Color::Default, v.as_ref());
-                        rustbox.present();
+                        context.input = v.clone();
+                        print(&context);
                     },
                     _ => { },
                 }
