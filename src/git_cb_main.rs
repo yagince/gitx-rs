@@ -35,6 +35,7 @@ struct Context {
     rustbox: RustBox,
     branches: Branches,
     input: String,
+    selected_index: usize,
 }
 
 impl Context {
@@ -73,6 +74,8 @@ fn print(context: &Context) {
     for (i, branch) in list.iter().enumerate() {
         if context.branches.is_current(branch) {
             context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, format!("{:2}: * {}", i, branch.name).as_ref());
+        } else if i == context.selected_index {
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, format!("{:2}:  {}", i, branch.name).as_ref());
         } else {
             context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, format!("{:2}:  {}", i, branch.name).as_ref());
         }
@@ -91,6 +94,7 @@ fn exec() {
         rustbox: rustbox,
         branches: branches,
         input: String::new(),
+        selected_index: 0,
     };
 
     print(&context);
