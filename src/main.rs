@@ -1,12 +1,12 @@
-extern crate gitx_rs;
+extern crate gitx;
 extern crate rustc_serialize;
 extern crate docopt;
 
 use docopt::Docopt;
 
 use std::process::Output;
-use gitx_rs::git::git::*;
-use gitx_rs::git::branch::*;
+use gitx::git::git::*;
+use gitx::git::branch::*;
 
 const USAGE: &'static str = "
 @yagince
@@ -29,16 +29,16 @@ struct Args {
 }
 
 fn main() {
-    // debug();
+    debug();
 
-    let args: Args = Docopt::new(USAGE)
-        .and_then(|d| d.decode())
-        .unwrap_or_else(|e| e.exit());
+    // let args: Args = Docopt::new(USAGE)
+    //     .and_then(|d| d.decode())
+    //     .unwrap_or_else(|e| e.exit());
 
-    println!("{:?}", args);
-    if args.cmd_start {
-        start(&args);
-    }
+    // println!("{:?}", args);
+    // if args.cmd_start {
+    //     start(&args);
+    // }
 }
 
 fn start(args: &Args) {

@@ -1,6 +1,6 @@
 [root]
-name = "gitx_rs"
-version = "0.1.0"
+name = "gitx"
+version = "0.0.1"
 dependencies = [
  "docopt 0.6.81 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",

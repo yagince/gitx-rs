@@ -1,6 +1,6 @@
 [package]
-name = "gitx_rs"
-version = "0.1.0"
+name = "gitx"
+version = "0.0.1"
 authors = ["yagince <straitwalk@gmail.com>"]
 
 [dependencies]
@@ -8,5 +8,6 @@ docopt = "0.6"
 rustc-serialize = "0.3"
 
 [[bin]]
-name = "git-x"
+name = "git-start"
 doc = false
+path = "src/git_start_main.rs"
