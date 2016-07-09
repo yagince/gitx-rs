@@ -56,7 +56,7 @@ fn exec() {
         if branches.is_current(branch) {
             rustbox.print(1, i+1, rustbox::RB_BOLD, Color::Green, Color::Default, format!("* {}", branch.name).as_ref());
         } else {
-            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::White, Color::Default, branch.name.as_ref());
+            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::White, Color::Default, format!("  {}", branch.name).as_ref());
         }
     }
 
