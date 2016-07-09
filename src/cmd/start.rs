@@ -1,4 +1,3 @@
-extern crate rustc_serialize;
 extern crate ansi_term;
 
 use std::process::Output;
