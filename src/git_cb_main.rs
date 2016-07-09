@@ -74,6 +74,12 @@ fn exec() {
                         rustbox.print(1, 0, rustbox::RB_BOLD, Color::White, Color::Default, v.as_ref());
                         rustbox.present();
                     },
+                    Key::Backspace | Key::Delete => {
+                        // TODO: clear
+                        v.pop();
+                        rustbox.print(1, 0, rustbox::RB_BOLD, Color::White, Color::Default, v.as_ref());
+                        rustbox.present();
+                    },
                     _ => { },
                 }
             },
