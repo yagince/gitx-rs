@@ -8,7 +8,11 @@ my git subcommands by Rust
 
 ## Installation
 
-**TODO:**
+You need to add the `.cargo/bin` to your PATH
+
+```
+cargo install --git https://github.com/yagince/gitx-rs.git
+```
 
 ## Commands
 
