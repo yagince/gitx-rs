@@ -46,6 +46,22 @@ impl Context {
     fn pop(&mut self) {
         self.input.pop();
     }
+
+    fn up_selected(&mut self) {
+        if self.selected_index == 0 {
+            self.selected_index = self.branches.list().len() - 1;
+        } else {
+            self.selected_index -= 1;
+        }
+    }
+
+    fn down_selected(&mut self) {
+        if self.selected_index == self.branches.list().len() - 1 {
+            self.selected_index = 0;
+        } else {
+            self.selected_index += 1;
+        }
+    }
 }
 
 fn main() {
@@ -106,11 +122,15 @@ fn exec() {
                     Key::Esc | Key::Ctrl('c') => { break; },
                     Key::Char(c) => {
                         context.input(c);
-                        print(&context);
                     },
                     Key::Ctrl('h') | Key::Backspace | Key::Delete => {
                         context.pop();
-                        print(&context);
+                    },
+                    Key::Ctrl('n') => {
+                        context.down_selected();
+                    },
+                    Key::Ctrl('p') => {
+                        context.up_selected();
                     },
                     _ => { },
                 }
@@ -118,5 +138,6 @@ fn exec() {
             Err(e) => panic!("{}", e.description()),
             _ => { }
         }
+        print(&context);
     }
 }
