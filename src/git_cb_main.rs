@@ -54,20 +54,27 @@ fn exec() {
 
     for (i, branch) in list.iter().enumerate() {
         if branches.is_current(branch) {
-            rustbox.print(1, i, rustbox::RB_BOLD, Color::Green, Color::Default, format!("* {}", branch.name).as_ref());
+            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::Green, Color::Default, format!("* {}", branch.name).as_ref());
         } else {
-            rustbox.print(1, i, rustbox::RB_BOLD, Color::White, Color::Default, branch.name.as_ref());
+            rustbox.print(1, i+1, rustbox::RB_BOLD, Color::White, Color::Default, branch.name.as_ref());
         }
     }
 
     rustbox.present();
 
+    let mut v = String::new();
+
     loop {
         match rustbox.poll_event(false) {
             Ok(rustbox::Event::KeyEvent(key)) => {
                 match key {
-                    Key::Char('q') => { break; }
-                    _ => { }
+                    Key::Char('q') | Key::Ctrl('c') => { break; },
+                    Key::Char(c) => {
+                        v.push(c);
+                        rustbox.print(1, 0, rustbox::RB_BOLD, Color::White, Color::Default, v.as_ref());
+                        rustbox.present();
+                    },
+                    _ => { },
                 }
             },
             Err(e) => panic!("{}", e.description()),
