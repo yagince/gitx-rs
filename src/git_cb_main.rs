@@ -126,10 +126,10 @@ fn exec() {
                     Key::Ctrl('h') | Key::Backspace | Key::Delete => {
                         context.pop();
                     },
-                    Key::Ctrl('n') => {
+                    Key::Ctrl('n') | Key::Down => {
                         context.down_selected();
                     },
-                    Key::Ctrl('p') => {
+                    Key::Ctrl('p') | Key::Up => {
                         context.up_selected();
                     },
                     _ => { },
