@@ -2,6 +2,12 @@
 name = "gitx"
 version = "0.0.1"
 authors = ["yagince <straitwalk@gmail.com>"]
+readme = "README.md"
+repository = "https://github.com/yagince/gitx-rs"
+homepage = "https://github.com/yagince/gitx-rs"
+description = """
+git subcommands
+"""
 
 [dependencies]
 docopt = "0.6"
