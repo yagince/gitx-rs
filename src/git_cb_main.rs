@@ -6,6 +6,7 @@ extern crate rustbox;
 use std::process::*;
 use std::error::Error;
 use std::default::Default;
+use std::thread;
 
 use docopt::Docopt;
 use rustbox::{Color, RustBox};
@@ -62,6 +63,16 @@ impl Context {
             self.selected_index += 1;
         }
     }
+
+    fn branch_list(&self) -> Vec<Branch> {
+        let mut list = self.branches.list();
+        list.sort();
+        list
+    }
+
+    fn selected_branch(&self) -> Branch {
+        self.branch_list().get(self.selected_index).map(|b| b.clone()).unwrap()
+    }
 }
 
 fn main() {
@@ -82,9 +93,7 @@ fn print(context: &Context) {
     context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Default, format!("QUERY > {}", context.input).as_ref());
     context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c to exit.");
 
-    let mut list = context.branches.list();
-    list.sort();
-
+    let list = context.branch_list();
     let horizontal_offset = 2;
 
     for (i, branch) in list.iter().enumerate() {
@@ -106,6 +115,24 @@ fn print(context: &Context) {
     }
 
     context.rustbox.present();
+}
+
+fn print_err(output: Output, context: &Context) {
+    context.rustbox.clear();
+
+    context.rustbox.print(
+        0,
+        0,
+        rustbox::RB_BOLD,
+        Color::Magenta,
+        Color::Default,
+        String::from_utf8_lossy(&output.stderr).as_ref(),
+    );
+    context.rustbox.present();
+
+    thread::sleep(2000);
+
+    print(context);
 }
 
 fn exec() {
@@ -139,6 +166,17 @@ fn exec() {
                     },
                     Key::Ctrl('p') | Key::Up => {
                         context.up_selected();
+                    },
+                    Key::Enter => {
+                        let branch = context.selected_branch();
+                        let output = git.checkout(&branch).unwrap();
+
+                        if output.status.success() {
+                            println!("{}", String::from_utf8_lossy(&output.stdout));
+                            break;
+                        } else {
+                            print_err(output, &context);
+                        }
                     },
                     _ => { },
                 }
