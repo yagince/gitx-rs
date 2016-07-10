@@ -88,12 +88,20 @@ fn print(context: &Context) {
     let horizontal_offset = 2;
 
     for (i, branch) in list.iter().enumerate() {
-        if context.branches.is_current(branch) {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, format!("{:2}: * {}", i, branch.name).as_ref());
-        } else if i == context.selected_index {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, format!("{:2}:  {}", i, branch.name).as_ref());
+
+        let text =
+            if context.branches.is_current(branch) {
+                format!("{:2}: * {}", i, branch.name)
+            } else {
+                format!("{:2}:  {}",  i, branch.name)
+            };
+
+        if i == context.selected_index {
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, text.as_ref());
+        } else if context.branches.is_current(branch) {
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, text.as_ref());
         } else {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, format!("{:2}:  {}", i, branch.name).as_ref());
+            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, text.as_ref());
         }
     }
 
