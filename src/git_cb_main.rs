@@ -6,6 +6,7 @@ extern crate rustbox;
 use std::process::*;
 use std::error::Error;
 use std::default::Default;
+use std::time::Duration;
 use std::thread;
 
 use docopt::Docopt;
@@ -130,7 +131,7 @@ fn print_err(output: Output, context: &Context) {
     );
     context.rustbox.present();
 
-    thread::sleep(2000);
+    thread::sleep(Duration::from_millis(2000));
 
     print(context);
 }
