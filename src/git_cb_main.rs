@@ -2,6 +2,7 @@ extern crate gitx;
 extern crate rustc_serialize;
 extern crate docopt;
 extern crate rustbox;
+extern crate regex;
 
 use std::process::*;
 use std::error::Error;
@@ -12,6 +13,7 @@ use std::thread;
 use docopt::Docopt;
 use rustbox::{Color, RustBox};
 use rustbox::Key;
+use regex::Regex;
 
 use gitx::git::git::*;
 use gitx::git::branch::*;
@@ -43,22 +45,37 @@ struct Context {
 impl Context {
     fn input(&mut self, c: char) {
         self.input.push(c);
+        self.adjust_selected_index();
     }
 
     fn pop(&mut self) {
         self.input.pop();
+        self.adjust_selected_index();
+    }
+
+    fn adjust_selected_index(&mut self) {
+        let list_size = self.branch_list().len();
+        if list_size <= 1 {
+            self.selected_index = 0;
+            return
+        }
+
+        let max_index = list_size - 1;
+        if self.selected_index > max_index {
+            self.selected_index = max_index;
+        }
     }
 
     fn up_selected(&mut self) {
         if self.selected_index == 0 {
-            self.selected_index = self.branches.list().len() - 1;
+            self.selected_index = self.branch_list().len() - 1;
         } else {
             self.selected_index -= 1;
         }
     }
 
     fn down_selected(&mut self) {
-        if self.selected_index == self.branches.list().len() - 1 {
+        if self.selected_index == self.branch_list().len() - 1 {
             self.selected_index = 0;
         } else {
             self.selected_index += 1;
@@ -68,11 +85,22 @@ impl Context {
     fn branch_list(&self) -> Vec<Branch> {
         let mut list = self.branches.list();
         list.sort();
-        list
+        if self.input.len() == 0 {
+            return list
+        }
+
+        match Regex::new(self.input.as_ref()) {
+            Ok(regex) => {
+                list.into_iter().filter(|x| {
+                    regex.is_match(x.name.as_ref())
+                }).collect()
+            },
+            Err(_) => list,
+        }
     }
 
-    fn selected_branch(&self) -> Branch {
-        self.branch_list().get(self.selected_index).map(|b| b.clone()).unwrap()
+    fn selected_branch(&self) -> Option<Branch> {
+        self.branch_list().get(self.selected_index).map(|b| b.clone())
     }
 }
 
@@ -169,14 +197,18 @@ fn exec() {
                         context.up_selected();
                     },
                     Key::Enter => {
-                        let branch = context.selected_branch();
-                        let output = git.checkout(&branch).unwrap();
+                        match context.selected_branch() {
+                            Some(branch) => {
+                                let output = git.checkout(&branch).unwrap();
 
-                        if output.status.success() {
-                            println!("{}", String::from_utf8_lossy(&output.stdout));
-                            break;
-                        } else {
-                            print_err(output, &context);
+                                if output.status.success() {
+                                    println!("{}", String::from_utf8_lossy(&output.stdout));
+                                    break;
+                                } else {
+                                    print_err(output, &context);
+                                }
+                            },
+                            _ => {},
                         }
                     },
                     _ => { },

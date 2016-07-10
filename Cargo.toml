@@ -8,6 +8,7 @@ docopt = "0.6"
 rustc-serialize = "0.3"
 ansi_term = "0.7"
 rustbox = "*"
+regex = "*"
 
 [[bin]]
 name = "git-start"

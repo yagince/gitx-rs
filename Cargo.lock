@@ -4,6 +4,7 @@ version = "0.0.1"
 dependencies = [
  "ansi_term 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "docopt 0.6.81 (registry+https://github.com/rust-lang/crates.io-index)",
+ "regex 0.1.71 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustbox 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
