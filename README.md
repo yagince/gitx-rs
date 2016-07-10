@@ -24,7 +24,6 @@ create a new branch with branch-type and issue-number
 
 ### git cb
 
-**TODO: **
 checkout by selecting from a list of branch
 
 ![change branch](http://i.gyazo.com/e39c6a7854cefa9a10c9184fb09488cc.gif)
