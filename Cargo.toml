@@ -16,8 +16,8 @@ git subcommands
 docopt = "0.6"
 rustc-serialize = "0.3"
 ansi_term = "0.7"
-rustbox = "*"
-regex = "*"
+rustbox = "0.8"
+regex = "0.1"
 
 [[bin]]
 name = "git-start"
