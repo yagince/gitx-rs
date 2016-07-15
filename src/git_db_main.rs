@@ -40,6 +40,7 @@ struct Context {
     branches: Branches,
     selected_index: usize,
     delete_indexes: HashSet<usize>,
+    remote_delete_indexes: HashSet<usize>,
 }
 
 impl Context {
@@ -73,8 +74,13 @@ impl Context {
         self.delete_indexes.insert(self.selected_index);
     }
 
+    fn mark_selected_to_remote_delete(&mut self) {
+        self.remote_delete_indexes.insert(self.selected_index);
+    }
+
     fn unmark_selected_to_delete(&mut self) {
         self.delete_indexes.remove(&self.selected_index);
+        self.remote_delete_indexes.remove(&self.selected_index);
     }
 
     fn decorate_branch_name(&self, branch: &Branch) -> String {
@@ -92,6 +98,13 @@ impl Context {
                 format!("D {}", text)
             } else {
                 format!("  {}", text)
+            };
+
+        let text =
+            if self.remote_delete_indexes.contains(&i) {
+                format!("R{}", text)
+            } else {
+                format!(" {}", text)
             };
 
         text
@@ -172,6 +185,7 @@ fn exec() {
         branches: branches,
         selected_index: 0,
         delete_indexes: HashSet::new(),
+        remote_delete_indexes: HashSet::new(),
     };
 
     print(&context);
@@ -183,6 +197,10 @@ fn exec() {
                     Key::Esc | Key::Ctrl('c') => { break; },
                     Key::Char('c') => {
                         context.unmark_selected_to_delete();
+                        context.down_selected();
+                    },
+                    Key::Char('r') => {
+                        context.mark_selected_to_remote_delete();
                         context.down_selected();
                     },
                     Key::Char('d') | Key::Ctrl('h') | Key::Backspace | Key::Delete => {
