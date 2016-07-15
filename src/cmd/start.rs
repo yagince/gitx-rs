@@ -48,12 +48,13 @@ pub fn exec(args: &Options) {
     println!("{}:\t{}", paint("IssueNumber", Green), paint_string(&args.issue_number, Cyan));
     println!("{}:\t{}", paint("Description", Green), paint_string(&args.description, Cyan));
 
-    print_stdout(&output);
+    print_output(&output);
 }
 
-fn print_stdout(output : &Output) {
+fn print_output(output : &Output) {
     println!("status: {}", output.status);
     println!("stdout: \n{}", String::from_utf8_lossy(&output.stdout));
+    println!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
 }
 
 fn paint(v: &str, color: Colour) -> ANSIString {
