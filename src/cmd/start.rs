@@ -2,7 +2,7 @@ extern crate ansi_term;
 
 use std::process::Output;
 
-use self::ansi_term::Style;
+use self::ansi_term::*;
 use self::ansi_term::Colour::*;
 
 use git::git::*;
@@ -44,9 +44,9 @@ pub fn exec(args: &Options) {
         .unwrap_or_else(|e| panic!(e));
 
     // TODO: エラーハンドリング
-    println!("{}:\t{}", Style::new().bold().fg(Green).paint("BranchType"), args.branch_type());
-    println!("{}:\t{}", Style::new().bold().fg(Green).paint("IssueNumber"), args.issue_number);
-    println!("{}:\t{}", Style::new().bold().fg(Green).paint("Description"), args.description);
+    println!("{}:\t{}", paint("BranchType", Green),  paint_string(&args.branch_type(), Cyan));
+    println!("{}:\t{}", paint("IssueNumber", Green), paint_string(&args.issue_number, Cyan));
+    println!("{}:\t{}", paint("Description", Green), paint_string(&args.description, Cyan));
 
     print_stdout(&output);
 }
@@ -54,6 +54,14 @@ pub fn exec(args: &Options) {
 fn print_stdout(output : &Output) {
     println!("status: {}", output.status);
     println!("stdout: \n{}", String::from_utf8_lossy(&output.stdout));
+}
+
+fn paint(v: &str, color: Colour) -> ANSIString {
+    Style::new().bold().fg(color).paint(v)
+}
+
+fn paint_string(v: &String, color: Colour) -> ANSIString {
+    Style::new().bold().fg(color).paint(v.as_ref())
 }
 
 #[cfg(test)]
