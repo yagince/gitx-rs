@@ -72,4 +72,8 @@ impl Git {
     pub fn create_branch(&self, branch : &Branch) -> io::Result<Output> {
         self.command().arg("checkout").arg("-b").arg(&branch.name).output()
     }
+
+    pub fn delete_local_branch(&self, branch: &Branch) ->  io::Result<Output> {
+        self.command().arg("branch").arg("-D").arg(&branch.name).output()
+    }
 }

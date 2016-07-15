@@ -66,8 +66,10 @@ impl Context {
         list
     }
 
-    fn selected_branch(&self) -> Option<Branch> {
-        self.branch_list().get(self.selected_index).map(|b| b.clone())
+    fn delete_marked_branches(&self) -> Vec<Branch> {
+        self.branch_list().into_iter().filter(|b| {
+            self.delete_indexes.contains(&self.index_of(b).unwrap())
+        }).map(|b| b.clone()).collect()
     }
 
     fn mark_selected_to_delete(&mut self) {
@@ -223,19 +225,15 @@ fn exec() {
                         context.up_selected();
                     },
                     Key::Enter => {
-                        match context.selected_branch() {
-                            Some(branch) => {
-                                // let output = git.checkout(&branch).unwrap();
-
-                                // if output.status.success() {
-                                //     println!("{}", String::from_utf8_lossy(&output.stdout));
-                                //     break;
-                                // } else {
-                                //     print_err(output, &context);
-                                // }
-                            },
-                            _ => {},
+                        for branch in context.delete_marked_branches() {
+                            let output = git.delete_local_branch(&branch).unwrap();
+                            if output.status.success() {
+                                println!("{}", String::from_utf8_lossy(&output.stdout));
+                            } else {
+                                print_err(output, &context);
+                            }
                         }
+                        break;
                     },
                     _ => { },
                 }
