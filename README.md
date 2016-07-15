@@ -24,7 +24,7 @@ cargo install --git https://github.com/yagince/gitx-rs.git
 
 create a new branch with branch-type and issue-number
 
-![create branch](https://gyazo.com/64c6f28297090fc8f853b8102e29b7a1.gif)
+![create branch](https://gyazo.com/713f7f07254e54f5ff59ab056e9ee2a1)
 
 ### git cb
 
