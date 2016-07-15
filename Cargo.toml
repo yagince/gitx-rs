@@ -28,3 +28,8 @@ path = "src/git_start_main.rs"
 name = "git-cb"
 doc = false
 path = "src/git_cb_main.rs"
+
+[[bin]]
+name = "git-db"
+doc = false
+path = "src/git_db_main.rs"
