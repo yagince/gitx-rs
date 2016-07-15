@@ -76,6 +76,35 @@ impl Context {
     fn unmark_selected_to_delete(&mut self) {
         self.delete_indexes.remove(&self.selected_index);
     }
+
+    fn decorate_branch_name(&self, branch: &Branch) -> String {
+        let i = self.index_of(branch).unwrap();
+
+        let text =
+            if self.branches.is_current(branch) {
+                format!("{:2}: * {}", i, branch.name)
+            } else {
+                format!("{:2}:  {}",  i, branch.name)
+            };
+
+        let text =
+            if self.delete_indexes.contains(&i) {
+                format!("D {}", text)
+            } else {
+                format!("  {}", text)
+            };
+
+        text
+    }
+
+    fn index_of(&self, branch: &Branch) -> Option<usize> {
+        for (i, b) in self.branch_list().iter().enumerate() {
+            if branch == b {
+                return Some(i)
+            }
+        }
+        None
+    }
 }
 
 fn main() {
@@ -100,19 +129,7 @@ fn print(context: &Context) {
 
     for (i, branch) in list.iter().enumerate() {
 
-        let text =
-            if context.branches.is_current(branch) {
-                format!("{:2}: * {}", i, branch.name)
-            } else {
-                format!("{:2}:  {}",  i, branch.name)
-            };
-
-        let text =
-            if context.delete_indexes.contains(&i) {
-                format!("D {}", text)
-            } else {
-                format!("  {}", text)
-            };
+        let text = context.decorate_branch_name(&branch);
 
         if i == context.selected_index {
             context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, text.as_ref());
