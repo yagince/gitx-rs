@@ -47,14 +47,15 @@ pub fn exec(args: &Options) {
     println!("{}:\t{}", paint("BranchType", Green),  paint_string(&args.branch_type(), Cyan));
     println!("{}:\t{}", paint("IssueNumber", Green), paint_string(&args.issue_number, Cyan));
     println!("{}:\t{}", paint("Description", Green), paint_string(&args.description, Cyan));
+    println!("");
 
     print_output(&output);
 }
 
 fn print_output(output : &Output) {
-    println!("status: {}", output.status);
-    println!("stdout: \n{}", String::from_utf8_lossy(&output.stdout));
-    println!("stderr: \n{}", String::from_utf8_lossy(&output.stderr));
+    println!("{}:\n  {}", paint("status", Yellow), output.status);
+    println!("{}:\n{}",   paint("stdout", Yellow), String::from_utf8_lossy(&output.stdout));
+    println!("{}:\n{}",   paint("stderr", Yellow), String::from_utf8_lossy(&output.stderr));
 }
 
 fn paint(v: &str, color: Colour) -> ANSIString {
