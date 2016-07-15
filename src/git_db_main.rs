@@ -135,10 +135,14 @@ fn main() {
 fn print(context: &Context) {
     context.rustbox.clear();
 
-    context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c to exit.");
+    context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `a` to delete local and remote branch.");
+    context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `d` to delete local branch.");
+    context.rustbox.print(0, 2, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `r` to delete remote branch.");
+    context.rustbox.print(0, 3, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c or `q` to exit.");
+    context.rustbox.print(0, 4, rustbox::RB_BOLD, Color::Green, Color::Default, "Press Enter to execute delete branches");
 
     let list = context.branch_list();
-    let horizontal_offset = 2;
+    let horizontal_offset = 5;
 
     for (i, branch) in list.iter().enumerate() {
 
@@ -194,7 +198,12 @@ fn exec() {
         match context.rustbox.poll_event(false) {
             Ok(rustbox::Event::KeyEvent(key)) => {
                 match key {
-                    Key::Esc | Key::Ctrl('c') => { break; },
+                    Key::Char('q') | Key::Esc | Key::Ctrl('c') => { break; },
+                    Key::Char('a') => {
+                        context.mark_selected_to_delete();
+                        context.mark_selected_to_remote_delete();
+                        context.down_selected();
+                    },
                     Key::Char('c') => {
                         context.unmark_selected_to_delete();
                         context.down_selected();
