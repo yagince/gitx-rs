@@ -8,8 +8,9 @@ use std::process::*;
 use std::error::Error;
 use std::default::Default;
 use std::time::Duration;
-use std::thread;
 use std::collections::HashSet;
+use std::thread;
+use std::sync::mpsc::*;
 
 use docopt::Docopt;
 use rustbox::{Color, RustBox};
@@ -41,6 +42,11 @@ struct Context {
     selected_index: usize,
     delete_indexes: HashSet<usize>,
     remote_delete_indexes: HashSet<usize>,
+}
+
+enum Message {
+    Quit,
+    Result(Output),
 }
 
 impl Context {
@@ -131,7 +137,30 @@ fn main() {
         println!("git cb {}", VERSION);
         exit(0);
     }
-    exec();
+
+    let mut outputs: Vec<Output> = Vec::new();
+    let rx = exec();
+    loop {
+        match rx.recv().unwrap() {
+            Message::Quit => break,
+            Message::Result(output) => {
+                outputs.push(output);
+            },
+        }
+    }
+
+    thread::sleep(Duration::from_millis(100));
+
+    for output in &outputs {
+        let out = String::from_utf8_lossy(&output.stdout);
+        if out.len() != 0 {
+            println!("{}", out.trim());
+        }
+        let err = String::from_utf8_lossy(&output.stderr);
+        if err.len() != 0 {
+            println!("{}", err.trim());
+        }
+    }
 }
 
 fn print(context: &Context) {
@@ -180,67 +209,68 @@ fn print_err(output: Output, context: &Context) {
     print(context);
 }
 
-fn exec() {
-    let rustbox = RustBox::init(Default::default()).unwrap_or_else(|e| panic!(e));
+fn exec() -> Receiver<Message> {
+    let (tx, rx): (Sender<Message>, Receiver<Message>) = channel();
 
-    let git = Git::new();
-    let branches = git.branches();
+    thread::spawn(move || {
+        let rustbox = RustBox::init(Default::default()).unwrap_or_else(|e| panic!(e));
 
-    let mut context = Context{
-        rustbox: rustbox,
-        branches: branches,
-        selected_index: 0,
-        delete_indexes: HashSet::new(),
-        remote_delete_indexes: HashSet::new(),
-    };
+        let git = Git::new();
+        let branches = git.branches();
 
-    print(&context);
+        let mut context = Context{
+            rustbox: rustbox,
+            branches: branches,
+            selected_index: 0,
+            delete_indexes: HashSet::new(),
+            remote_delete_indexes: HashSet::new(),
+        };
 
-    loop {
-        match context.rustbox.poll_event(false) {
-            Ok(rustbox::Event::KeyEvent(key)) => {
-                match key {
-                    Key::Char('q') | Key::Esc | Key::Ctrl('c') => { break; },
-                    Key::Char('a') => {
-                        context.mark_selected_to_delete();
-                        context.mark_selected_to_remote_delete();
-                        context.down_selected();
-                    },
-                    Key::Char('c') => {
-                        context.unmark_selected_to_delete();
-                        context.down_selected();
-                    },
-                    Key::Char('r') => {
-                        context.mark_selected_to_remote_delete();
-                        context.down_selected();
-                    },
-                    Key::Char('d') | Key::Ctrl('h') | Key::Backspace | Key::Delete => {
-                        context.mark_selected_to_delete();
-                        context.down_selected();
-                    },
-                    Key::Ctrl('n') | Key::Down => {
-                        context.down_selected();
-                    },
-                    Key::Ctrl('p') | Key::Up => {
-                        context.up_selected();
-                    },
-                    Key::Enter => {
-                        for branch in context.delete_marked_branches() {
-                            let output = git.delete_local_branch(&branch).unwrap();
-                            if output.status.success() {
-                                println!("{}", String::from_utf8_lossy(&output.stdout));
-                            } else {
-                                print_err(output, &context);
+        loop {
+            print(&context);
+
+            match context.rustbox.poll_event(false) {
+                Ok(rustbox::Event::KeyEvent(key)) => {
+                    match key {
+                        Key::Char('q') | Key::Esc | Key::Ctrl('c') => { break; },
+                        Key::Char('a') => {
+                            context.mark_selected_to_delete();
+                            context.mark_selected_to_remote_delete();
+                            context.down_selected();
+                        },
+                        Key::Char('c') => {
+                            context.unmark_selected_to_delete();
+                            context.down_selected();
+                        },
+                        Key::Char('r') => {
+                            context.mark_selected_to_remote_delete();
+                            context.down_selected();
+                        },
+                        Key::Char('d') | Key::Ctrl('h') | Key::Backspace | Key::Delete => {
+                            context.mark_selected_to_delete();
+                            context.down_selected();
+                        },
+                        Key::Ctrl('n') | Key::Down => {
+                            context.down_selected();
+                        },
+                        Key::Ctrl('p') | Key::Up => {
+                            context.up_selected();
+                        },
+                        Key::Enter => {
+                            for branch in context.delete_marked_branches() {
+                                let output = git.delete_local_branch(&branch).unwrap();
+                                tx.send(Message::Result(output)).unwrap();
                             }
-                        }
-                        break;
-                    },
-                    _ => { },
-                }
-            },
-            Err(e) => panic!("{}", e.description()),
-            _ => { }
+                            break;
+                        },
+                        _ => { },
+                    }
+                },
+                Err(e) => panic!("{}", e.description()),
+                _ => { }
+            }
         }
-        print(&context);
-    }
+        tx.send(Message::Quit).unwrap();
+    });
+    rx
 }
