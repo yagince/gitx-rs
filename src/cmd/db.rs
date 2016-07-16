@@ -1,6 +1,4 @@
-extern crate rustc_serialize;
 extern crate rustbox;
-extern crate regex;
 
 use std::process::*;
 use std::error::Error;
