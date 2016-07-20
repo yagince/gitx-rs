@@ -25,7 +25,7 @@ impl Git {
     }
 
     pub fn branches(&self) -> Branches {
-        let output = self.command().arg("branch").output().unwrap();
+        let output = self.command().arg("branch").arg("-vv").output().unwrap();
 
         let mut current = String::new();
 
@@ -33,7 +33,7 @@ impl Git {
             .lines()
             .map(|l| l.trim_matches(' '))
             .map(|l| {
-                let branch = Branch{name: l.replace("* ", "").to_string()};
+                let branch = Branch::new(l.replace("* ", "").as_ref());
                 if l.starts_with('*') {
                     current = branch.name.clone();
                 }
@@ -66,7 +66,7 @@ impl Git {
     }
 
     pub fn checkout_prev(&self) -> io::Result<Output> {
-        self.checkout(&Branch{name: "-".to_string()})
+        self.checkout(&Branch::new_by_name("-"))
     }
 
     pub fn create_branch(&self, branch : &Branch) -> io::Result<Output> {
