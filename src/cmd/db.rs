@@ -56,11 +56,15 @@ impl Context {
     }
 
     fn mark_selected_to_delete(&mut self) {
-        self.delete_indexes.insert(self.selected_index);
+        if self.selected_branch().name != "master" {
+            self.delete_indexes.insert(self.selected_index);
+        }
     }
 
     fn mark_selected_to_remote_delete(&mut self) {
-        self.remote_delete_indexes.insert(self.selected_index);
+        if self.selected_branch().name != "master" {
+            self.remote_delete_indexes.insert(self.selected_index);
+        }
     }
 
     fn unmark_selected_to_delete(&mut self) {
@@ -102,6 +106,10 @@ impl Context {
             }
         }
         None
+    }
+
+    fn selected_branch(&self) -> Branch {
+        return self.branch_list().get(self.selected_index).unwrap().clone()
     }
 }
 
