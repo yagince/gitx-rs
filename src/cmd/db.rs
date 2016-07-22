@@ -184,7 +184,7 @@ fn print(context: &Context) {
 
     context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `a` to delete local and remote branch.");
     context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `d` to delete local branch.");
-    context.rustbox.print(0, 2, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `r` to delete remote branch.");
+    context.rustbox.print(0, 2, rustbox::RB_BOLD, Color::Green, Color::Default, "(TODO) Press `r` to delete remote branch.");
     context.rustbox.print(0, 3, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c or `q` to exit.");
     context.rustbox.print(0, 4, rustbox::RB_BOLD, Color::Green, Color::Default, "Press Enter to execute delete branches");
 
