@@ -33,7 +33,7 @@ fn main() {
         .unwrap_or_else(|e| e.exit());
 
     if args.flag_version {
-        println!("git cb {}", VERSION);
+        println!("git db {}", VERSION);
         exit(0);
     }
 
