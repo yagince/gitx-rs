@@ -10,7 +10,7 @@ use docopt::Docopt;
 
 use gitx::cmd::*;
 
-const VERSION: &'static str = "0.0.1";
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 const USAGE: &'static str = "
 Usage:
