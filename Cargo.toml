@@ -1,6 +1,6 @@
 [package]
 name = "gitx"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["yagince <straitwalk@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/yagince/gitx-rs"
