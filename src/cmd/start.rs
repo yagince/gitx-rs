@@ -40,7 +40,7 @@ impl Options {
 
 pub fn exec(args: &Options) {
     let output = Git::new()
-        .create_branch(&Branch::new(args.branch_name().as_ref()))
+        .create_branch(&Branch::new_by_name(args.branch_name().as_ref()))
         .unwrap_or_else(|e| panic!(e));
 
     // TODO: エラーハンドリング
