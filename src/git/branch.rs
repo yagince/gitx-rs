@@ -46,7 +46,7 @@ impl Branch {
 
     pub fn new(log: &str) -> Branch {
         lazy_static! {
-            static ref LOG_REGEXP: Regex = Regex::new(r"(?P<name>\S+)\s+(?P<commit>[:alnum:]+)\s+(?:(?P<remote>\[.*?\])\s+)?(?P<msg>.*)").unwrap();
+            static ref LOG_REGEXP: Regex = Regex::new(r"(?P<name>\S+)\s+(?P<commit>[[:alnum:]]+)\s+(?:(?P<remote>\[.*?\])\s+)?(?P<msg>.*)").unwrap();
         }
         LOG_REGEXP.captures(log).map_or_else(|| panic!(format!("invalid branch log. : {}", log)), |c: Captures| {
             Branch{
