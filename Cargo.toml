@@ -13,8 +13,9 @@ git subcommands
 """
 
 [dependencies]
-docopt = "0.6"
-rustc-serialize = "0.3"
+docopt = "0.8"
+serde = "1.0"
+serde_derive = "1.0"
 ansi_term = "0.7"
 rustbox = "0.8"
 regex = "0.2.2"

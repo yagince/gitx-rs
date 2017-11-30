@@ -1,5 +1,6 @@
 extern crate gitx;
-extern crate rustc_serialize;
+#[macro_use]
+extern crate serde_derive;
 extern crate docopt;
 
 use docopt::Docopt;
@@ -19,7 +20,7 @@ Options:
   -v --version     Show version.
 ";
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 struct Args {
     arg_type: String,
     arg_number: String,
@@ -39,7 +40,7 @@ impl Args {
 
 fn main() {
     let args: Args = Docopt::new(USAGE)
-        .and_then(|d| d.decode())
+        .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
     // println!("{:?}", args);
