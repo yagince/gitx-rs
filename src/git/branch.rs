@@ -50,10 +50,10 @@ impl Branch {
         }
         LOG_REGEXP.captures(log).map_or_else(|| panic!("invalid branch log"), |c: Captures| {
             Branch{
-                name: c.name("name").unwrap_or("").to_string(),
-                last_commit: c.name("commit").unwrap_or("").to_string(),
-                last_commit_msg: c.name("msg").unwrap_or("").to_string(),
-                remote_branch_name: c.name("remote").unwrap_or("").to_string(),
+                name: c.name("name").map_or("", |m| m.as_str()).to_owned(),
+                last_commit: c.name("commit").map_or("", |m| m.as_str()).to_owned(),
+                last_commit_msg: c.name("msg").map_or("", |m| m.as_str()).to_owned(),
+                remote_branch_name: c.name("remote").map_or("", |m| m.as_str()).to_owned(),
             }
         })
     }
