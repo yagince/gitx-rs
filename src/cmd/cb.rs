@@ -68,7 +68,7 @@ impl Context {
             return list
         }
 
-        match Regex::new(self.input.as_ref()) {
+        match Regex::new(format!("(?i){}", self.input).as_ref()) {
             Ok(regex) => {
                 list.into_iter().filter(|x| {
                     regex.is_match(x.name.as_ref())
