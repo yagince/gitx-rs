@@ -100,12 +100,7 @@ impl Context {
     }
 
     fn index_of(&self, branch: &Branch) -> Option<usize> {
-        for (i, b) in self.branch_list().iter().enumerate() {
-            if branch == b {
-                return Some(i)
-            }
-        }
-        None
+        self.branch_list().iter().position(|x| x == branch)
     }
 
     fn selected_branch(&self) -> Branch {
