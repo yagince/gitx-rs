@@ -3,23 +3,9 @@ extern crate gitx;
 extern crate serde_derive;
 extern crate docopt;
 
-use docopt::Docopt;
-
 use std::process::Output;
 use gitx::git::git::*;
 use gitx::git::branch::*;
-
-const USAGE: &'static str = "
-@yagince
-
-Usage:
-  git-x start <type> <number> <comment>
-  git-x (--help | --version)
-
-Options:
-  -h --help     Show this screen.
-  --version     Show version.
-";
 
 #[derive(Debug, Deserialize)]
 struct Args {
@@ -42,19 +28,19 @@ fn main() {
     // }
 }
 
-fn start(args: &Args) {
-    let git = Git::new();
-    let arg_type = match args.arg_type.as_ref() {
-        "f" => "feature",
-        "s" => "spark",
-        "h" => "hotfix",
-        t   => t
-    };
-    let branch_name = format!("{}/{}-{}", arg_type, args.arg_number, args.arg_comment);
-    let output = git.create_branch(&Branch::new(&branch_name))
-        .unwrap_or_else(|e| panic!(e));
-    print_stdout(&output);
-}
+// fn start(args: &Args) {
+//     let git = Git::new();
+//     let arg_type = match args.arg_type.as_ref() {
+//         "f" => "feature",
+//         "s" => "spark",
+//         "h" => "hotfix",
+//         t   => t
+//     };
+//     let branch_name = format!("{}/{}-{}", arg_type, args.arg_number, args.arg_comment);
+//     let output = git.create_branch(&Branch::new(&branch_name))
+//         .unwrap_or_else(|e| panic!(e));
+//     print_stdout(&output);
+// }
 
 fn print_stdout(output : &Output) {
     println!("status: {}", output.status);
