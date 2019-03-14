@@ -1,15 +1,12 @@
-extern crate rustbox;
-extern crate regex;
-
 use std::process::*;
 use std::error::Error;
 use std::default::Default;
 use std::time::Duration;
 use std::thread;
 
-use self::rustbox::{Color, RustBox};
-use self::rustbox::Key;
-use self::regex::Regex;
+use rustbox::{Color, RustBox};
+use rustbox::Key;
+use regex::Regex;
 
 use git::git::*;
 use git::branch::*;

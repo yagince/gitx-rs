@@ -1,5 +1,3 @@
-extern crate rustbox;
-
 use std::process::*;
 use std::error::Error;
 use std::default::Default;
@@ -7,8 +5,8 @@ use std::collections::HashSet;
 use std::thread;
 use std::sync::mpsc::*;
 
-use self::rustbox::{Color, RustBox};
-use self::rustbox::Key;
+use rustbox::{Color, RustBox};
+use rustbox::Key;
 
 use git::git::*;
 use git::branch::*;

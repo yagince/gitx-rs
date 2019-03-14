@@ -1,9 +1,7 @@
-extern crate ansi_term;
-
 use std::process::Output;
 
-use self::ansi_term::*;
-use self::ansi_term::Colour::*;
+use ansi_term::*;
+use ansi_term::Colour::*;
 
 use git::git::*;
 use git::branch::*;

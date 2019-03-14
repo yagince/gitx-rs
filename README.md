@@ -4,7 +4,7 @@ my git subcommands by Rust
 
 # Requirements
 
-- Rust 1.9.0
+- Rust 1.32.0 or later
 
 ## Installation
 

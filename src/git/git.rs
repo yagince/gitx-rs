@@ -2,8 +2,8 @@ use std::io;
 use std::collections::HashMap;
 use std::process::{Command, Output};
 use std::ffi::*;
-use git::branch::*;
-use git::log::*;
+use self::super::branch::*;
+use self::super::log::*;
 
 pub struct Git {
     path: String,

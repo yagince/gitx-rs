@@ -3,8 +3,8 @@ extern crate gitx;
 extern crate serde_derive;
 extern crate docopt;
 
-use std::process::*;
 use docopt::Docopt;
+use std::process::*;
 
 use gitx::cmd::cb;
 
@@ -24,7 +24,7 @@ Options:
 struct Args {
     flag_version: bool,
 }
-fn main() {
+fn main() -> Result<(), Box<std::error::Error>> {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
@@ -33,5 +33,5 @@ fn main() {
         println!("git cb {}", VERSION);
         exit(0);
     }
-    cb::exec();
+    cb::exec()
 }
