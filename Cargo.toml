@@ -20,3 +20,18 @@ ansi_term = "0.7"
 rustbox = "0.11"
 regex = "0.2.2"
 lazy_static = "1.0.0"
+
+[[bin]]
+name = "git-start"
+doc = false
+path = "bin/git-start.rs"
+
+[[bin]]
+name = "git-cb"
+doc = false
+path = "bin/git-cb.rs"
+
+[[bin]]
+name = "git-db"
+doc = false
+path = "bin/git-db.rs"
