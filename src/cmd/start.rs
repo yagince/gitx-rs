@@ -63,7 +63,7 @@ fn paint(v: &str, color: Colour) -> ANSIString {
 }
 
 fn paint_string(v: &String, color: Colour) -> ANSIString {
-    Style::new().bold().fg(color).paint(v.as_ref())
+    Style::new().bold().fg(color).paint(v)
 }
 
 #[cfg(test)]
