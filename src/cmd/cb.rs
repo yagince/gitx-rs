@@ -1,7 +1,6 @@
 extern crate rustbox;
 extern crate regex;
 
-use std::io;
 use std::process::*;
 use std::error::Error;
 use std::default::Default;
@@ -85,8 +84,8 @@ impl Context {
 }
 
 
-pub fn exec() -> io::Result<()> {
-    let rustbox = RustBox::init(Default::default()).unwrap_or_else(|e| panic!(e));
+pub fn exec() -> Result<(), Box<std::error::Error>> {
+    let rustbox = RustBox::init(Default::default())?;
 
     let git = Git::new();
     let branches = git.branches()?;
