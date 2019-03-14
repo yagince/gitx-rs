@@ -28,7 +28,7 @@ struct Args {
     flag_version: bool,
 }
 
-fn main() {
+fn main() -> Result<(), Box<std::error::Error>> {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
@@ -39,7 +39,8 @@ fn main() {
     }
 
     let mut outputs: Vec<Output> = Vec::new();
-    let rx = db::exec();
+    let rx = db::exec()?;
+
     loop {
         match rx.recv().unwrap() {
             db::Message::Quit => break,
@@ -61,4 +62,6 @@ fn main() {
             println!("{}", err.trim());
         }
     }
+
+    Ok(())
 }
