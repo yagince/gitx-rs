@@ -113,22 +113,22 @@ impl Context {
     }
 }
 
-pub fn exec() -> Receiver<Message> {
+pub fn exec() -> Result<Receiver<Message>, Box<std::error::Error>> {
     let (tx, rx): (Sender<Message>, Receiver<Message>) = channel();
+    let rustbox = RustBox::init(Default::default())?;
+
+    let git = Git::new();
+    let branches = git.branches()?;
+
+    let mut context = Context{
+        rustbox: rustbox,
+        branches: branches,
+        selected_index: 0,
+        delete_indexes: HashSet::new(),
+        remote_delete_indexes: HashSet::new(),
+    };
 
     thread::spawn(move || {
-        let rustbox = RustBox::init(Default::default()).unwrap_or_else(|e| panic!(e));
-
-        let git = Git::new();
-        let branches = git.branches();
-
-        let mut context = Context{
-            rustbox: rustbox,
-            branches: branches,
-            selected_index: 0,
-            delete_indexes: HashSet::new(),
-            remote_delete_indexes: HashSet::new(),
-        };
 
         loop {
             print(&context);
@@ -176,7 +176,7 @@ pub fn exec() -> Receiver<Message> {
         }
         tx.send(Message::Quit).unwrap();
     });
-    rx
+    Ok(rx)
 }
 
 fn print(context: &Context) {

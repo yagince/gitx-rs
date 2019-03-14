@@ -24,8 +24,8 @@ impl Git {
             .output()
     }
 
-    pub fn branches(&self) -> Branches {
-        let output = self.command().arg("branch").arg("-vv").output().unwrap();
+    pub fn branches(&self) -> io::Result<Branches> {
+        let output = self.command().arg("branch").arg("-vv").output()?;
 
         let mut current = String::new();
 
@@ -43,7 +43,7 @@ impl Git {
                 branches.insert(branch.name.clone(), branch);
                 branches
             });
-        Branches{branches: map, current: current}
+        Ok(Branches{branches: map, current: current})
     }
 
     pub fn logs(&self) -> Vec<Log> {

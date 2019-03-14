@@ -29,7 +29,7 @@ impl Options {
             "s" => "spark",
             "h" => "hotfix",
             t   => t
-        }.to_string()
+        }.into()
     }
 
     pub fn branch_name(&self) -> String {
@@ -41,12 +41,12 @@ impl Options {
 pub fn exec(args: &Options) {
     let output = Git::new()
         .create_branch(&Branch::new_by_name(args.branch_name().as_ref()))
-        .unwrap_or_else(|e| panic!(e));
+        .expect("Create branch");
 
     // TODO: エラーハンドリング
-    println!("{}:\t{}", paint("BranchType", Green),  paint_string(&args.branch_type(), Cyan));
-    println!("{}:\t{}", paint("IssueNumber", Green), paint_string(&args.issue_number, Cyan));
-    println!("{}:\t{}", paint("Description", Green), paint_string(&args.description, Cyan));
+    println!("{}:\t{}", paint("BranchType", Green),  paint(&args.branch_type(), Cyan));
+    println!("{}:\t{}", paint("IssueNumber", Green), paint(&args.issue_number, Cyan));
+    println!("{}:\t{}", paint("Description", Green), paint(&args.description, Cyan));
     println!("");
 
     print_output(&output);
@@ -59,10 +59,6 @@ fn print_output(output : &Output) {
 }
 
 fn paint(v: &str, color: Colour) -> ANSIString {
-    Style::new().bold().fg(color).paint(v)
-}
-
-fn paint_string(v: &String, color: Colour) -> ANSIString {
     Style::new().bold().fg(color).paint(v)
 }
 

@@ -59,7 +59,7 @@ fn debug() {
 
     println!("== Branch List ==============================");
 
-    let branches = git.branches();
+    let branches = git.branches().expect("List branches");
     println!("branches: {:?}", branches.branches);
     println!("current: {:?}", branches.current_branch());
 

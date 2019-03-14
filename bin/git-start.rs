@@ -43,8 +43,6 @@ fn main() {
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
-    // println!("{:?}", args);
-
     if args.flag_version {
         println!("git start {}", VERSION);
         exit(0);
