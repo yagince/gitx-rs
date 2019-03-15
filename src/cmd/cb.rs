@@ -1,15 +1,15 @@
-use std::process::*;
-use std::error::Error;
 use std::default::Default;
-use std::time::Duration;
+use std::error::Error;
+use std::process::*;
 use std::thread;
+use std::time::Duration;
 
-use rustbox::{Color, RustBox};
-use rustbox::Key;
 use regex::Regex;
+use rustbox::Key;
+use rustbox::{Color, RustBox};
 
-use git::git::*;
 use git::branch::*;
+use git::git::*;
 
 struct Context {
     rustbox: RustBox,
@@ -33,7 +33,7 @@ impl Context {
         let list_size = self.branch_list().len();
         if list_size <= 1 {
             self.selected_index = 0;
-            return
+            return;
         }
 
         let max_index = list_size - 1;
@@ -62,24 +62,24 @@ impl Context {
         let mut list = self.branches.list();
         list.sort();
         if self.input.len() == 0 {
-            return list
+            return list;
         }
 
         match Regex::new(format!("(?i){}", self.input).as_ref()) {
-            Ok(regex) => {
-                list.into_iter().filter(|x| {
-                    regex.is_match(x.name.as_ref())
-                }).collect()
-            },
+            Ok(regex) => list
+                .into_iter()
+                .filter(|x| regex.is_match(x.name.as_ref()))
+                .collect(),
             Err(_) => list,
         }
     }
 
     fn selected_branch(&self) -> Option<Branch> {
-        self.branch_list().get(self.selected_index).map(|b| b.clone())
+        self.branch_list()
+            .get(self.selected_index)
+            .map(|b| b.clone())
     }
 }
-
 
 pub fn exec() -> Result<(), Box<std::error::Error>> {
     let rustbox = RustBox::init(Default::default())?;
@@ -87,7 +87,7 @@ pub fn exec() -> Result<(), Box<std::error::Error>> {
     let git = Git::new();
     let branches = git.branches()?;
 
-    let mut context = Context{
+    let mut context = Context {
         rustbox: rustbox,
         branches: branches,
         input: String::new(),
@@ -98,41 +98,39 @@ pub fn exec() -> Result<(), Box<std::error::Error>> {
 
     loop {
         match context.rustbox.poll_event(false) {
-            Ok(rustbox::Event::KeyEvent(key)) => {
-                match key {
-                    Key::Esc | Key::Ctrl('c') => { break; },
-                    Key::Char(c) => {
-                        context.input(c);
-                    },
-                    Key::Ctrl('h') | Key::Backspace | Key::Delete => {
-                        context.pop();
-                    },
-                    Key::Ctrl('n') | Key::Down => {
-                        context.down_selected();
-                    },
-                    Key::Ctrl('p') | Key::Up => {
-                        context.up_selected();
-                    },
-                    Key::Enter => {
-                        match context.selected_branch() {
-                            Some(branch) => {
-                                let output = git.checkout(&branch).unwrap();
-
-                                if output.status.success() {
-                                    println!("{}", String::from_utf8_lossy(&output.stdout));
-                                    break;
-                                } else {
-                                    print_err(output, &context);
-                                }
-                            },
-                            _ => {},
-                        }
-                    },
-                    _ => { },
+            Ok(rustbox::Event::KeyEvent(key)) => match key {
+                Key::Esc | Key::Ctrl('c') => {
+                    break;
                 }
+                Key::Char(c) => {
+                    context.input(c);
+                }
+                Key::Ctrl('h') | Key::Backspace | Key::Delete => {
+                    context.pop();
+                }
+                Key::Ctrl('n') | Key::Down => {
+                    context.down_selected();
+                }
+                Key::Ctrl('p') | Key::Up => {
+                    context.up_selected();
+                }
+                Key::Enter => match context.selected_branch() {
+                    Some(branch) => {
+                        let output = git.checkout(&branch).unwrap();
+
+                        if output.status.success() {
+                            println!("{}", String::from_utf8_lossy(&output.stdout));
+                            break;
+                        } else {
+                            print_err(output, &context);
+                        }
+                    }
+                    _ => {}
+                },
+                _ => {}
             },
             Err(e) => panic!("{}", e.description()),
-            _ => { }
+            _ => {}
         }
         print(&context);
     }
@@ -143,27 +141,60 @@ pub fn exec() -> Result<(), Box<std::error::Error>> {
 fn print(context: &Context) {
     context.rustbox.clear();
 
-    context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Default, format!("QUERY > {}", context.input).as_ref());
-    context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c to exit.");
+    context.rustbox.print(
+        0,
+        0,
+        rustbox::RB_BOLD,
+        Color::White,
+        Color::Default,
+        format!("QUERY > {}", context.input).as_ref(),
+    );
+    context.rustbox.print(
+        0,
+        1,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "Press ESC or Ctrl+c to exit.",
+    );
 
     let list = context.branch_list();
     let horizontal_offset = 2;
 
     for (i, branch) in list.iter().enumerate() {
-
-        let text =
-            if context.branches.is_current(branch) {
-                format!("{:2}: * {}", i, branch.name)
-            } else {
-                format!("{:2}:  {}",  i, branch.name)
-            };
+        let text = if context.branches.is_current(branch) {
+            format!("{:2}: * {}", i, branch.name)
+        } else {
+            format!("{:2}:  {}", i, branch.name)
+        };
 
         if i == context.selected_index {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::Green,
+                Color::Magenta,
+                text.as_ref(),
+            );
         } else if context.branches.is_current(branch) {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::Green,
+                Color::Default,
+                text.as_ref(),
+            );
         } else {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::White,
+                Color::Default,
+                text.as_ref(),
+            );
         }
     }
 

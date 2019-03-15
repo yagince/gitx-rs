@@ -1,15 +1,15 @@
-use std::process::*;
-use std::error::Error;
-use std::default::Default;
 use std::collections::HashSet;
-use std::thread;
+use std::default::Default;
+use std::error::Error;
+use std::process::*;
 use std::sync::mpsc::*;
+use std::thread;
 
-use rustbox::{Color, RustBox};
 use rustbox::Key;
+use rustbox::{Color, RustBox};
 
-use git::git::*;
 use git::branch::*;
+use git::git::*;
 
 struct Context {
     rustbox: RustBox,
@@ -48,9 +48,11 @@ impl Context {
     }
 
     fn delete_marked_branches(&self) -> Vec<Branch> {
-        self.branch_list().into_iter().filter(|b| {
-            self.delete_indexes.contains(&self.index_of(b).unwrap())
-        }).map(|b| b.clone()).collect()
+        self.branch_list()
+            .into_iter()
+            .filter(|b| self.delete_indexes.contains(&self.index_of(b).unwrap()))
+            .map(|b| b.clone())
+            .collect()
     }
 
     fn mark_selected_to_delete(&mut self) {
@@ -73,26 +75,23 @@ impl Context {
     fn decorate_branch_name(&self, branch: &Branch) -> String {
         let i = self.index_of(branch).unwrap();
 
-        let text =
-            if self.branches.is_current(branch) {
-                format!("{:2}: * {}", i, branch.name)
-            } else {
-                format!("{:2}:  {}",  i, branch.name)
-            };
+        let text = if self.branches.is_current(branch) {
+            format!("{:2}: * {}", i, branch.name)
+        } else {
+            format!("{:2}:  {}", i, branch.name)
+        };
 
-        let text =
-            if self.delete_indexes.contains(&i) {
-                format!("D {}", text)
-            } else {
-                format!("  {}", text)
-            };
+        let text = if self.delete_indexes.contains(&i) {
+            format!("D {}", text)
+        } else {
+            format!("  {}", text)
+        };
 
-        let text =
-            if self.remote_delete_indexes.contains(&i) {
-                format!("R{}", text)
-            } else {
-                format!(" {}", text)
-            };
+        let text = if self.remote_delete_indexes.contains(&i) {
+            format!("R{}", text)
+        } else {
+            format!(" {}", text)
+        };
 
         text
     }
@@ -102,7 +101,7 @@ impl Context {
     }
 
     fn selected_branch(&self) -> Branch {
-        return self.branch_list().get(self.selected_index).unwrap().clone()
+        return self.branch_list().get(self.selected_index).unwrap().clone();
     }
 }
 
@@ -113,7 +112,7 @@ pub fn exec() -> Result<Receiver<Message>, Box<std::error::Error>> {
     let git = Git::new();
     let branches = git.branches()?;
 
-    let mut context = Context{
+    let mut context = Context {
         rustbox: rustbox,
         branches: branches,
         selected_index: 0,
@@ -122,49 +121,48 @@ pub fn exec() -> Result<Receiver<Message>, Box<std::error::Error>> {
     };
 
     thread::spawn(move || {
-
         loop {
             print(&context);
 
             match context.rustbox.poll_event(false) {
-                Ok(rustbox::Event::KeyEvent(key)) => {
-                    match key {
-                        Key::Char('q') | Key::Esc | Key::Ctrl('c') => { break; },
-                        Key::Char('a') => {
-                            context.mark_selected_to_delete();
-                            context.mark_selected_to_remote_delete();
-                            context.down_selected();
-                        },
-                        Key::Char('c') => {
-                            context.unmark_selected_to_delete();
-                            context.down_selected();
-                        },
-                        Key::Char('r') => {
-                            context.mark_selected_to_remote_delete();
-                            context.down_selected();
-                        },
-                        Key::Char('d') | Key::Ctrl('h') | Key::Backspace | Key::Delete => {
-                            context.mark_selected_to_delete();
-                            context.down_selected();
-                        },
-                        Key::Ctrl('n') | Key::Down => {
-                            context.down_selected();
-                        },
-                        Key::Ctrl('p') | Key::Up => {
-                            context.up_selected();
-                        },
-                        Key::Enter => {
-                            for branch in context.delete_marked_branches() {
-                                let output = git.delete_local_branch(&branch).unwrap();
-                                tx.send(Message::Result(output)).unwrap();
-                            }
-                            break;
-                        },
-                        _ => { },
+                Ok(rustbox::Event::KeyEvent(key)) => match key {
+                    Key::Char('q') | Key::Esc | Key::Ctrl('c') => {
+                        break;
                     }
+                    Key::Char('a') => {
+                        context.mark_selected_to_delete();
+                        context.mark_selected_to_remote_delete();
+                        context.down_selected();
+                    }
+                    Key::Char('c') => {
+                        context.unmark_selected_to_delete();
+                        context.down_selected();
+                    }
+                    Key::Char('r') => {
+                        context.mark_selected_to_remote_delete();
+                        context.down_selected();
+                    }
+                    Key::Char('d') | Key::Ctrl('h') | Key::Backspace | Key::Delete => {
+                        context.mark_selected_to_delete();
+                        context.down_selected();
+                    }
+                    Key::Ctrl('n') | Key::Down => {
+                        context.down_selected();
+                    }
+                    Key::Ctrl('p') | Key::Up => {
+                        context.up_selected();
+                    }
+                    Key::Enter => {
+                        for branch in context.delete_marked_branches() {
+                            let output = git.delete_local_branch(&branch).unwrap();
+                            tx.send(Message::Result(output)).unwrap();
+                        }
+                        break;
+                    }
+                    _ => {}
                 },
                 Err(e) => panic!("{}", e.description()),
-                _ => { }
+                _ => {}
             }
         }
         tx.send(Message::Quit).unwrap();
@@ -175,25 +173,80 @@ pub fn exec() -> Result<Receiver<Message>, Box<std::error::Error>> {
 fn print(context: &Context) {
     context.rustbox.clear();
 
-    context.rustbox.print(0, 0, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `a` to delete local and remote branch.");
-    context.rustbox.print(0, 1, rustbox::RB_BOLD, Color::Green, Color::Default, "Press `d` to delete local branch.");
-    context.rustbox.print(0, 2, rustbox::RB_BOLD, Color::Green, Color::Default, "(TODO) Press `r` to delete remote branch.");
-    context.rustbox.print(0, 3, rustbox::RB_BOLD, Color::Green, Color::Default, "Press ESC or Ctrl+c or `q` to exit.");
-    context.rustbox.print(0, 4, rustbox::RB_BOLD, Color::Green, Color::Default, "Press Enter to execute delete branches");
+    context.rustbox.print(
+        0,
+        0,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "Press `a` to delete local and remote branch.",
+    );
+    context.rustbox.print(
+        0,
+        1,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "Press `d` to delete local branch.",
+    );
+    context.rustbox.print(
+        0,
+        2,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "(TODO) Press `r` to delete remote branch.",
+    );
+    context.rustbox.print(
+        0,
+        3,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "Press ESC or Ctrl+c or `q` to exit.",
+    );
+    context.rustbox.print(
+        0,
+        4,
+        rustbox::RB_BOLD,
+        Color::Green,
+        Color::Default,
+        "Press Enter to execute delete branches",
+    );
 
     let list = context.branch_list();
     let horizontal_offset = 5;
 
     for (i, branch) in list.iter().enumerate() {
-
         let text = context.decorate_branch_name(&branch);
 
         if i == context.selected_index {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Magenta, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::Green,
+                Color::Magenta,
+                text.as_ref(),
+            );
         } else if context.branches.is_current(branch) {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::Green, Color::Default, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::Green,
+                Color::Default,
+                text.as_ref(),
+            );
         } else {
-            context.rustbox.print(1, i+horizontal_offset, rustbox::RB_BOLD, Color::White, Color::Default, text.as_ref());
+            context.rustbox.print(
+                1,
+                i + horizontal_offset,
+                rustbox::RB_BOLD,
+                Color::White,
+                Color::Default,
+                text.as_ref(),
+            );
         }
     }
 

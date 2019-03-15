@@ -8,9 +8,9 @@ use std::process::*;
 
 use gitx::cmd::cb;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-const USAGE: &'static str = "
+const USAGE: &str = "
 Usage:
   git-cb
   git-cb (--help | --version)

@@ -1,7 +1,8 @@
-#[macro_use] extern crate lazy_static;
-extern crate rustbox;
-extern crate regex;
+#[macro_use]
+extern crate lazy_static;
 extern crate ansi_term;
+extern crate regex;
+extern crate rustbox;
 
-pub mod git;
 pub mod cmd;
+pub mod git;

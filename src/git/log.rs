@@ -8,7 +8,10 @@ pub struct Log {
 
 impl Log {
     pub fn new(commit: &str, message: &str) -> Log {
-        Log{commit: commit.trim().to_string(), message: message.trim().to_string()}
+        Log {
+            commit: commit.trim().to_string(),
+            message: message.trim().to_string(),
+        }
     }
 }
 

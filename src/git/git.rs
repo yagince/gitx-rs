@@ -1,9 +1,9 @@
-use std::io;
-use std::collections::HashMap;
-use std::process::{Command, Output};
-use std::ffi::*;
 use self::super::branch::*;
 use self::super::log::*;
+use std::collections::HashMap;
+use std::ffi::*;
+use std::io;
+use std::process::{Command, Output};
 
 pub struct Git {
     path: String,
@@ -11,7 +11,9 @@ pub struct Git {
 
 impl Git {
     pub fn new() -> Git {
-        Git{path: "git".to_string()}
+        Git {
+            path: "git".to_string(),
+        }
     }
 
     fn command(&self) -> Command {
@@ -19,9 +21,7 @@ impl Git {
     }
 
     pub fn status(&self) -> io::Result<Output> {
-        self.command()
-            .arg("status")
-            .output()
+        self.command().arg("status").output()
     }
 
     pub fn branches(&self) -> io::Result<Branches> {
@@ -43,15 +43,14 @@ impl Git {
                 branches.insert(branch.name.clone(), branch);
                 branches
             });
-        Ok(Branches{branches: map, current: current})
+        Ok(Branches {
+            branches: map,
+            current: current,
+        })
     }
 
     pub fn logs(&self) -> Vec<Log> {
-        let output = self.command()
-            .arg("log")
-            .arg("--oneline")
-            .output()
-            .unwrap();
+        let output = self.command().arg("log").arg("--oneline").output().unwrap();
         String::from_utf8_lossy(&output.stdout)
             .lines()
             .map(|l| {
@@ -61,7 +60,7 @@ impl Git {
             .collect()
     }
 
-    pub fn checkout(&self, branch : &Branch) -> io::Result<Output> {
+    pub fn checkout(&self, branch: &Branch) -> io::Result<Output> {
         self.command().arg("checkout").arg(&branch.name).output()
     }
 
@@ -69,11 +68,19 @@ impl Git {
         self.checkout(&Branch::new_by_name("-"))
     }
 
-    pub fn create_branch(&self, branch : &Branch) -> io::Result<Output> {
-        self.command().arg("checkout").arg("-b").arg(&branch.name).output()
+    pub fn create_branch(&self, branch: &Branch) -> io::Result<Output> {
+        self.command()
+            .arg("checkout")
+            .arg("-b")
+            .arg(&branch.name)
+            .output()
     }
 
-    pub fn delete_local_branch(&self, branch: &Branch) ->  io::Result<Output> {
-        self.command().arg("branch").arg("-D").arg(&branch.name).output()
+    pub fn delete_local_branch(&self, branch: &Branch) -> io::Result<Output> {
+        self.command()
+            .arg("branch")
+            .arg("-D")
+            .arg(&branch.name)
+            .output()
     }
 }

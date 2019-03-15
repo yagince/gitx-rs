@@ -1,7 +1,7 @@
 extern crate regex;
 
+use self::regex::{Captures, Regex};
 use std::collections::HashMap;
-use self::regex::{Regex, Captures};
 
 #[derive(Debug)]
 pub struct Branches {
@@ -48,22 +48,23 @@ impl Branch {
         lazy_static! {
             static ref LOG_REGEXP: Regex = Regex::new(r"(?P<name>\S+)\s+(?P<commit>[[:alnum:]]+)\s+(?:(?P<remote>\[.*?\])\s+)?(?P<msg>.*)").unwrap();
         }
-        LOG_REGEXP.captures(log).map_or_else(|| panic!(format!("invalid branch log. : {}", log)), |c: Captures| {
-            Branch{
+        LOG_REGEXP.captures(log).map_or_else(
+            || panic!(format!("invalid branch log. : {}", log)),
+            |c: Captures| Branch {
                 name: c.name("name").map_or("", |m| m.as_str()).to_owned(),
                 last_commit: c.name("commit").map_or("", |m| m.as_str()).to_owned(),
                 last_commit_msg: c.name("msg").map_or("", |m| m.as_str()).to_owned(),
                 remote_branch_name: c.name("remote").map_or("", |m| m.as_str()).to_owned(),
-            }
-        })
+            },
+        )
     }
 }
 
 #[cfg(test)]
 mod tests {
     mod branches {
-        use std::collections::HashMap;
         use super::super::*;
+        use std::collections::HashMap;
 
         #[test]
         fn current_branch() {
@@ -72,7 +73,10 @@ mod tests {
             let branch = Branch::new_by_name("second");
             map.insert("second".to_string(), branch.clone());
 
-            let branches = Branches{ branches: map, current: "second".to_string()};
+            let branches = Branches {
+                branches: map,
+                current: "second".to_string(),
+            };
 
             assert_eq!(branch, branches.current_branch());
         }
@@ -86,10 +90,13 @@ mod tests {
             let second = Branch::new_by_name("second");
             map.insert("second".to_string(), second.clone());
 
-            let branches = Branches{ branches: map, current: second.name.clone()};
+            let branches = Branches {
+                branches: map,
+                current: second.name.clone(),
+            };
 
             assert_eq!(false, branches.is_current(&first));
-            assert_eq!(true,  branches.is_current(&second));
+            assert_eq!(true, branches.is_current(&second));
         }
     }
 
@@ -101,12 +108,17 @@ mod tests {
             let log = "master                              2d6953d [origin/master: behind 8] Merged in feature/presentation-material-ceres (pull request #287)";
             let branch = Branch::new(log);
 
-            assert_eq!(Branch{
-                name: "master".to_string(),
-                last_commit: "2d6953d".to_string(),
-                last_commit_msg: "Merged in feature/presentation-material-ceres (pull request #287)".to_string(),
-                remote_branch_name: "[origin/master: behind 8]".to_string(),
-            }, branch);
+            assert_eq!(
+                Branch {
+                    name: "master".to_string(),
+                    last_commit: "2d6953d".to_string(),
+                    last_commit_msg:
+                        "Merged in feature/presentation-material-ceres (pull request #287)"
+                            .to_string(),
+                    remote_branch_name: "[origin/master: behind 8]".to_string(),
+                },
+                branch
+            );
         }
     }
 }
